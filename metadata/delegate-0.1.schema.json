@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Delegate",
+  "type": "object",
+  "properties": {
+    "delegate_address": {
+      "type": "string",
+      "description": "The address of the delegate"
+    },
+    "dao_token_address": {
+      "type": "string",
+      "description": "The address of the DAO's token"
+    },
+    "dao_token_chain_id": {
+      "type": "string",
+      "description": "The chain ID of the DAO's token"
+    },
+    "status": {
+      "type": "string",
+      "description": "The status of the delegate",
+      "enum": ["Active", "Withdrawn", "Pending"]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the delegate"
+    },
+    "profile_picture_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "The URL of the delegate's profile picture"
+    },
+    "statement": {
+      "type": "string",
+      "description": "The delegate's statement"
+    },
+    "social_media_handles": {
+      "type": "object",
+      "description": "The delegate's social media handles with cryptographic proofs",
+      "properties": {
+        "twitter": {
+          "type": "object",
+          "description": "The Twitter handle and cryptographic proof",
+          "properties": {
+            "handle": {
+              "type": "string",
+              "description": "The Twitter handle"
+            },
+            "proof": {
+              "type": "string",
+              "description": "The cryptographic proof of mapping between Twitter handle and address"
+            }
+          },
+          "required": ["handle", "proof"]
+        },
+        "discord": {
+          "type": "object",
+          "description": "The Discord handle and cryptographic proof",
+          "properties": {
+            "handle": {
+              "type": "string",
+              "description": "The Discord handle"
+            },
+            "proof": {
+              "type": "string",
+              "description": "The cryptographic proof of mapping between Discord handle and address"
+            }
+          },
+          "required": ["handle", "proof"]
+        },
+        "discourse": {
+          "type": "object",
+          "description": "The Discourse handle and cryptographic proof",
+          "properties": {
+            "handle": {
+              "type": "string",
+              "description": "The Discourse handle"
+            },
+            "proof": {
+              "type": "string",
+              "description": "The cryptographic proof of mapping between Discourse handle and address"
+            }
+          },
+          "required": ["handle", "proof"]
+        }
+      }
+    }
+  },
+  "required": ["delegate_address", "dao_token_address", "dao_token_chain_id"]
+}
+

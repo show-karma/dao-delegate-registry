@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/DelegateRegistry.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.19;\n\ncontract DelegateRegistry {\n    struct Delegate {\n        address delegateAddress;\n        address tokenAddress;\n        uint256 tokenChainId;\n    }\n\n    mapping(address => mapping(address => mapping(uint256 => Delegate))) public delegates;\n\n    event DelegateAdded(address indexed delegateAddress, address tokenAddress, uint256 tokenChainId, bytes metadata);\n    event DelegateRemoved(address indexed delegateAddress);\n    event DelegateMetadataUpdated(address indexed delegateAddress, address tokenAddress, uint256 chainId, bytes metadata);\n\n    function registerDelegate(address _tokenAddress, uint256 _tokenChainId, bytes memory _metadata) public {\n        Delegate memory newDelegate = Delegate({\n            delegateAddress: msg.sender,\n            tokenAddress: _tokenAddress,\n            tokenChainId: _tokenChainId\n        });\n\n        require(delegates[msg.sender][_tokenAddress][_tokenChainId].delegateAddress == address(0), \"Delegate already exists for this address, token address, and chain ID\");\n\n        delegates[msg.sender][_tokenAddress][_tokenChainId] = newDelegate;\n\n        emit DelegateAdded(msg.sender, _tokenAddress, _tokenChainId, _metadata);\n    }\n\n    function deregisterDelegate() public {\n        address delegateAddress = msg.sender;\n        Delegate memory removedDelegate = delegates[delegateAddress][delegateAddress][0];\n        delete delegates[delegateAddress][removedDelegate.tokenAddress][removedDelegate.tokenChainId];\n\n        emit DelegateRemoved(removedDelegate.delegateAddress);\n    }\n    \n    function updateDelegateMetadata(address _tokenAddress, uint256 _chainId, bytes memory _metadata) public {\n        Delegate storage delegateToUpdate = delegates[msg.sender][_tokenAddress][_chainId];\n        require(delegateToUpdate.delegateAddress == msg.sender, \"Delegate does not exist for this address, token address, and chain ID\");\n\n        emit DelegateMetadataUpdated(msg.sender, _tokenAddress, _chainId, _metadata);\n    }\n\n    function getDelegate(address _delegateAddress, address _tokenAddress, uint256 _tokenChainId) public view returns (Delegate memory) {\n        return delegates[_delegateAddress][_tokenAddress][_tokenChainId];\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
