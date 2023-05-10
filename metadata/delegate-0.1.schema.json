@@ -3,9 +3,9 @@
   "title": "Delegate",
   "type": "object",
   "properties": {
-    "ipfsHash": {
+    "ipfsMetadata": {
       "type": "string",
-      "description": "The IPFS hash of the delegate's information"
+      "description": "The IPFS hash of the delegate's metadata"
     },
     "status": {
       "type": "string",
