@@ -1,0 +1,14 @@
+type Delegate @entity(immutable: true) {
+  id: String!
+  delegateAddress: Bytes! # address
+  tokenAddress: Bytes! # address
+  tokenChainId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  status: String # string
+  name: String # string
+  profilePictureUrl: String # string
+  statement: String # string
+  ipfsMetadata: String # string
+}
