@@ -1,16 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
+// Test emit events
+// Add role
+// Add expiry time for roles
 contract DelegateRegistry is EIP712 {
     constructor() EIP712("delegate-registry", "1.0") { }
-    struct Delegate {
-        address delegateAddress;
-        address tokenAddress;
-        uint256 tokenChainId;
-    }
 
-    mapping(address => mapping(address => mapping(uint256 => Delegate))) public delegates;
+    mapping(address => mapping(address => mapping(uint256 => uint8))) public delegates;
 
     mapping (address => uint) public nonces;
 
@@ -19,9 +17,8 @@ contract DelegateRegistry is EIP712 {
     bytes32 public constant DEREGISTER_TYPEHASH =
         keccak256("DeregisterDelegate(address tokenAddress,uint256 tokenChainId,uint256 nonce,uint256 expiry)");
 
-    event DelegateAdded(address indexed delegateAddress, address tokenAddress, uint256 tokenChainId, string metadata);
-    event DelegateRemoved(address indexed delegateAddress, address tokenAddress, uint256 tokenChainId);
-    event DelegateMetadataUpdated(address indexed delegateAddress, address tokenAddress, uint256 tokenChainId, string metadata);
+    event DelegateAdded(address indexed delegateAddress, address indexed tokenAddress, uint256 tokenChainId, string metadata);
+    event DelegateRemoved(address indexed delegateAddress, address indexed tokenAddress, uint256 tokenChainId);
 
     function registerDelegate(address tokenAddress, uint256 tokenChainId, string memory metadata) public {
         _registerDelegate(msg.sender, tokenAddress, tokenChainId, metadata);
@@ -85,10 +82,10 @@ contract DelegateRegistry is EIP712 {
         _deregisterDelegate(signer, tokenAddress, tokenChainId);
     }
 
-    function getDelegate(address delegateAddress, address tokenAddress, uint256 tokenChainId)
+    function isDelegateRegistered(address delegateAddress, address tokenAddress, uint256 tokenChainId)
         public
         view
-        returns (Delegate memory)
+        returns (uint8 isRegistered)
     {
         return delegates[delegateAddress][tokenAddress][tokenChainId];
     }
@@ -101,20 +98,13 @@ contract DelegateRegistry is EIP712 {
     )
          private
     {
-        Delegate memory newDelegate = Delegate({
-            delegateAddress: delegateAddress,
-            tokenAddress: tokenAddress,
-            tokenChainId: tokenChainId
-        });
-
-        delegates[delegateAddress][tokenAddress][tokenChainId] = newDelegate;
+        delegates[delegateAddress][tokenAddress][tokenChainId] = 1;
 
         emit DelegateAdded(delegateAddress, tokenAddress, tokenChainId, metadata);
     }
 
     function _deregisterDelegate(address delegateAddress, address tokenAddress, uint256 tokenChainId) private {
-        Delegate memory removeDelegate = delegates[delegateAddress][tokenAddress][tokenChainId];
-        delete removeDelegate;
+        delegates[delegateAddress][tokenAddress][tokenChainId] = 0;
         emit DelegateRemoved(delegateAddress, tokenAddress, tokenChainId);
     }
 }
