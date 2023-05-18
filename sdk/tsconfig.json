@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "outDir": "dist",
+      "module": "commonjs",
+      "target": "es2017",
+      "baseUrl": ".",
+      "paths": {
+        "*": ["node_modules/*"]
+      },
+      "sourceMap": true,
+      "noImplicitAny": false,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "experimentalDecorators": true
+    },
+    "include": ["src/**/*"],
+  }
+  
