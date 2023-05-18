@@ -10,7 +10,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await deploy('DelegateRegistry', {
         from: deployer,
         log: true,
-        autoMine: true
+        autoMine: true,
+        args: [<Admin Adddress>]
     });
 };
 export default func;
