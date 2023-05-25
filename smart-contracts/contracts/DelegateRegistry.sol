@@ -3,9 +3,6 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-// Test emit events
-// Add role
-// Add expiry time for roles
 contract DelegateRegistry is EIP712, AccessControl {
     bytes32 public constant PROVIDER_ROLE = keccak256("PROVIDER_ROLE");
 
@@ -34,7 +31,7 @@ contract DelegateRegistry is EIP712, AccessControl {
         _registerDelegate(msg.sender, tokenAddress, tokenChainId, metadata);
     }
 
-    function registerDelegate(
+    function uploadDelegate(
         address delegateAddress,
         address tokenAddress,
         uint256 tokenChainId,
