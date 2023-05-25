@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-// Test emit events
-// Add role
-// Add expiry time for roles
-contract DelegateRegistry is EIP712 {
-    constructor() EIP712("delegate-registry", "1.0") { }
+contract DelegateRegistry is EIP712, AccessControl {
+    bytes32 public constant PROVIDER_ROLE = keccak256("PROVIDER_ROLE");
 
     mapping(address => mapping(address => mapping(uint256 => uint8))) public delegates;
-
     mapping (address => uint) public nonces;
+
+    uint public expiryDateForRegistryBackfill;
+
+    constructor(address admin) EIP712("delegate-registry", "1.0") {
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+    }
 
     bytes32 public constant REGISTER_TYPEHASH =
         keccak256("RegisterDelegate(address tokenAddress,uint256 tokenChainId,string metadata,uint256 nonce,uint256 expiry)");
@@ -20,8 +23,22 @@ contract DelegateRegistry is EIP712 {
     event DelegateAdded(address indexed delegateAddress, address indexed tokenAddress, uint256 tokenChainId, string metadata);
     event DelegateRemoved(address indexed delegateAddress, address indexed tokenAddress, uint256 tokenChainId);
 
+    function setExpiryDateForRegistryBackfill(uint expiry) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        expiryDateForRegistryBackfill = expiry;
+    }
+
     function registerDelegate(address tokenAddress, uint256 tokenChainId, string memory metadata) public {
         _registerDelegate(msg.sender, tokenAddress, tokenChainId, metadata);
+    }
+
+    function uploadDelegate(
+        address delegateAddress,
+        address tokenAddress,
+        uint256 tokenChainId,
+        string memory metadata
+    ) public onlyRole(PROVIDER_ROLE) {
+        require(block.timestamp <= expiryDateForRegistryBackfill, "RegisterDelegate: registry backfill period has expired");
+        _registerDelegate(delegateAddress, tokenAddress, tokenChainId, metadata);
     }
 
     function registerDelegateBySig(
