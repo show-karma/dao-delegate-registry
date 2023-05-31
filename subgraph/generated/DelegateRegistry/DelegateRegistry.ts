@@ -40,36 +40,6 @@ export class DelegateAdded__Params {
   }
 }
 
-export class DelegateMetadataUpdated extends ethereum.Event {
-  get params(): DelegateMetadataUpdated__Params {
-    return new DelegateMetadataUpdated__Params(this);
-  }
-}
-
-export class DelegateMetadataUpdated__Params {
-  _event: DelegateMetadataUpdated;
-
-  constructor(event: DelegateMetadataUpdated) {
-    this._event = event;
-  }
-
-  get delegateAddress(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get tokenAddress(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get tokenChainId(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get metadata(): string {
-    return this._event.parameters[3].value.toString();
-  }
-}
-
 export class DelegateRemoved extends ethereum.Event {
   get params(): DelegateRemoved__Params {
     return new DelegateRemoved__Params(this);
@@ -96,49 +66,81 @@ export class DelegateRemoved__Params {
   }
 }
 
-export class DelegateRegistry__delegatesResult {
-  value0: Address;
-  value1: Address;
-  value2: BigInt;
-
-  constructor(value0: Address, value1: Address, value2: BigInt) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromAddress(this.value0));
-    map.set("value1", ethereum.Value.fromAddress(this.value1));
-    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
-    return map;
-  }
-
-  getDelegateAddress(): Address {
-    return this.value0;
-  }
-
-  getTokenAddress(): Address {
-    return this.value1;
-  }
-
-  getTokenChainId(): BigInt {
-    return this.value2;
+export class RoleAdminChanged extends ethereum.Event {
+  get params(): RoleAdminChanged__Params {
+    return new RoleAdminChanged__Params(this);
   }
 }
 
-export class DelegateRegistry__getDelegateResultValue0Struct extends ethereum.Tuple {
-  get delegateAddress(): Address {
-    return this[0].toAddress();
+export class RoleAdminChanged__Params {
+  _event: RoleAdminChanged;
+
+  constructor(event: RoleAdminChanged) {
+    this._event = event;
   }
 
-  get tokenAddress(): Address {
-    return this[1].toAddress();
+  get role(): Bytes {
+    return this._event.parameters[0].value.toBytes();
   }
 
-  get tokenChainId(): BigInt {
-    return this[2].toBigInt();
+  get previousAdminRole(): Bytes {
+    return this._event.parameters[1].value.toBytes();
+  }
+
+  get newAdminRole(): Bytes {
+    return this._event.parameters[2].value.toBytes();
+  }
+}
+
+export class RoleGranted extends ethereum.Event {
+  get params(): RoleGranted__Params {
+    return new RoleGranted__Params(this);
+  }
+}
+
+export class RoleGranted__Params {
+  _event: RoleGranted;
+
+  constructor(event: RoleGranted) {
+    this._event = event;
+  }
+
+  get role(): Bytes {
+    return this._event.parameters[0].value.toBytes();
+  }
+
+  get account(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get sender(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+}
+
+export class RoleRevoked extends ethereum.Event {
+  get params(): RoleRevoked__Params {
+    return new RoleRevoked__Params(this);
+  }
+}
+
+export class RoleRevoked__Params {
+  _event: RoleRevoked;
+
+  constructor(event: RoleRevoked) {
+    this._event = event;
+  }
+
+  get role(): Bytes {
+    return this._event.parameters[0].value.toBytes();
+  }
+
+  get account(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get sender(): Address {
+    return this._event.parameters[2].value.toAddress();
   }
 }
 
@@ -147,14 +149,98 @@ export class DelegateRegistry extends ethereum.SmartContract {
     return new DelegateRegistry("DelegateRegistry", address);
   }
 
-  delegates(
-    param0: Address,
-    param1: Address,
-    param2: BigInt
-  ): DelegateRegistry__delegatesResult {
+  DEFAULT_ADMIN_ROLE(): Bytes {
+    let result = super.call(
+      "DEFAULT_ADMIN_ROLE",
+      "DEFAULT_ADMIN_ROLE():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_DEFAULT_ADMIN_ROLE(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "DEFAULT_ADMIN_ROLE",
+      "DEFAULT_ADMIN_ROLE():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  DEREGISTER_TYPEHASH(): Bytes {
+    let result = super.call(
+      "DEREGISTER_TYPEHASH",
+      "DEREGISTER_TYPEHASH():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_DEREGISTER_TYPEHASH(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "DEREGISTER_TYPEHASH",
+      "DEREGISTER_TYPEHASH():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  PROVIDER_ROLE(): Bytes {
+    let result = super.call("PROVIDER_ROLE", "PROVIDER_ROLE():(bytes32)", []);
+
+    return result[0].toBytes();
+  }
+
+  try_PROVIDER_ROLE(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "PROVIDER_ROLE",
+      "PROVIDER_ROLE():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  REGISTER_TYPEHASH(): Bytes {
+    let result = super.call(
+      "REGISTER_TYPEHASH",
+      "REGISTER_TYPEHASH():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_REGISTER_TYPEHASH(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "REGISTER_TYPEHASH",
+      "REGISTER_TYPEHASH():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  delegates(param0: Address, param1: Address, param2: BigInt): i32 {
     let result = super.call(
       "delegates",
-      "delegates(address,address,uint256):(address,address,uint256)",
+      "delegates(address,address,uint256):(uint8)",
       [
         ethereum.Value.fromAddress(param0),
         ethereum.Value.fromAddress(param1),
@@ -162,21 +248,17 @@ export class DelegateRegistry extends ethereum.SmartContract {
       ]
     );
 
-    return new DelegateRegistry__delegatesResult(
-      result[0].toAddress(),
-      result[1].toAddress(),
-      result[2].toBigInt()
-    );
+    return result[0].toI32();
   }
 
   try_delegates(
     param0: Address,
     param1: Address,
     param2: BigInt
-  ): ethereum.CallResult<DelegateRegistry__delegatesResult> {
+  ): ethereum.CallResult<i32> {
     let result = super.tryCall(
       "delegates",
-      "delegates(address,address,uint256):(address,address,uint256)",
+      "delegates(address,address,uint256):(uint8)",
       [
         ethereum.Value.fromAddress(param0),
         ethereum.Value.fromAddress(param1),
@@ -187,58 +269,183 @@ export class DelegateRegistry extends ethereum.SmartContract {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new DelegateRegistry__delegatesResult(
-        value[0].toAddress(),
-        value[1].toAddress(),
-        value[2].toBigInt()
-      )
-    );
+    return ethereum.CallResult.fromValue(value[0].toI32());
   }
 
-  getDelegate(
-    _delegateAddress: Address,
-    _tokenAddress: Address,
-    _tokenChainId: BigInt
-  ): DelegateRegistry__getDelegateResultValue0Struct {
+  expiryDateForRegistryBackfill(): BigInt {
     let result = super.call(
-      "getDelegate",
-      "getDelegate(address,address,uint256):((address,address,uint256))",
+      "expiryDateForRegistryBackfill",
+      "expiryDateForRegistryBackfill():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_expiryDateForRegistryBackfill(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "expiryDateForRegistryBackfill",
+      "expiryDateForRegistryBackfill():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  getRoleAdmin(role: Bytes): Bytes {
+    let result = super.call("getRoleAdmin", "getRoleAdmin(bytes32):(bytes32)", [
+      ethereum.Value.fromFixedBytes(role)
+    ]);
+
+    return result[0].toBytes();
+  }
+
+  try_getRoleAdmin(role: Bytes): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "getRoleAdmin",
+      "getRoleAdmin(bytes32):(bytes32)",
+      [ethereum.Value.fromFixedBytes(role)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  hasRole(role: Bytes, account: Address): boolean {
+    let result = super.call("hasRole", "hasRole(bytes32,address):(bool)", [
+      ethereum.Value.fromFixedBytes(role),
+      ethereum.Value.fromAddress(account)
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_hasRole(role: Bytes, account: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall("hasRole", "hasRole(bytes32,address):(bool)", [
+      ethereum.Value.fromFixedBytes(role),
+      ethereum.Value.fromAddress(account)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  isDelegateRegistered(
+    delegateAddress: Address,
+    tokenAddress: Address,
+    tokenChainId: BigInt
+  ): i32 {
+    let result = super.call(
+      "isDelegateRegistered",
+      "isDelegateRegistered(address,address,uint256):(uint8)",
       [
-        ethereum.Value.fromAddress(_delegateAddress),
-        ethereum.Value.fromAddress(_tokenAddress),
-        ethereum.Value.fromUnsignedBigInt(_tokenChainId)
+        ethereum.Value.fromAddress(delegateAddress),
+        ethereum.Value.fromAddress(tokenAddress),
+        ethereum.Value.fromUnsignedBigInt(tokenChainId)
       ]
     );
 
-    return changetype<DelegateRegistry__getDelegateResultValue0Struct>(
-      result[0].toTuple()
-    );
+    return result[0].toI32();
   }
 
-  try_getDelegate(
-    _delegateAddress: Address,
-    _tokenAddress: Address,
-    _tokenChainId: BigInt
-  ): ethereum.CallResult<DelegateRegistry__getDelegateResultValue0Struct> {
+  try_isDelegateRegistered(
+    delegateAddress: Address,
+    tokenAddress: Address,
+    tokenChainId: BigInt
+  ): ethereum.CallResult<i32> {
     let result = super.tryCall(
-      "getDelegate",
-      "getDelegate(address,address,uint256):((address,address,uint256))",
+      "isDelegateRegistered",
+      "isDelegateRegistered(address,address,uint256):(uint8)",
       [
-        ethereum.Value.fromAddress(_delegateAddress),
-        ethereum.Value.fromAddress(_tokenAddress),
-        ethereum.Value.fromUnsignedBigInt(_tokenChainId)
+        ethereum.Value.fromAddress(delegateAddress),
+        ethereum.Value.fromAddress(tokenAddress),
+        ethereum.Value.fromUnsignedBigInt(tokenChainId)
       ]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(
-      changetype<DelegateRegistry__getDelegateResultValue0Struct>(
-        value[0].toTuple()
-      )
+    return ethereum.CallResult.fromValue(value[0].toI32());
+  }
+
+  nonces(param0: Address): BigInt {
+    let result = super.call("nonces", "nonces(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_nonces(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("nonces", "nonces(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  supportsInterface(interfaceId: Bytes): boolean {
+    let result = super.call(
+      "supportsInterface",
+      "supportsInterface(bytes4):(bool)",
+      [ethereum.Value.fromFixedBytes(interfaceId)]
     );
+
+    return result[0].toBoolean();
+  }
+
+  try_supportsInterface(interfaceId: Bytes): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "supportsInterface",
+      "supportsInterface(bytes4):(bool)",
+      [ethereum.Value.fromFixedBytes(interfaceId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+}
+
+export class ConstructorCall extends ethereum.Call {
+  get inputs(): ConstructorCall__Inputs {
+    return new ConstructorCall__Inputs(this);
+  }
+
+  get outputs(): ConstructorCall__Outputs {
+    return new ConstructorCall__Outputs(this);
+  }
+}
+
+export class ConstructorCall__Inputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+
+  get admin(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class ConstructorCall__Outputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
   }
 }
 
@@ -258,12 +465,108 @@ export class DeregisterDelegateCall__Inputs {
   constructor(call: DeregisterDelegateCall) {
     this._call = call;
   }
+
+  get tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get tokenChainId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
 }
 
 export class DeregisterDelegateCall__Outputs {
   _call: DeregisterDelegateCall;
 
   constructor(call: DeregisterDelegateCall) {
+    this._call = call;
+  }
+}
+
+export class DeregisterDelegateBySigCall extends ethereum.Call {
+  get inputs(): DeregisterDelegateBySigCall__Inputs {
+    return new DeregisterDelegateBySigCall__Inputs(this);
+  }
+
+  get outputs(): DeregisterDelegateBySigCall__Outputs {
+    return new DeregisterDelegateBySigCall__Outputs(this);
+  }
+}
+
+export class DeregisterDelegateBySigCall__Inputs {
+  _call: DeregisterDelegateBySigCall;
+
+  constructor(call: DeregisterDelegateBySigCall) {
+    this._call = call;
+  }
+
+  get tokenAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get tokenChainId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get nonce(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get expiry(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get v(): i32 {
+    return this._call.inputValues[4].value.toI32();
+  }
+
+  get r(): Bytes {
+    return this._call.inputValues[5].value.toBytes();
+  }
+
+  get s(): Bytes {
+    return this._call.inputValues[6].value.toBytes();
+  }
+}
+
+export class DeregisterDelegateBySigCall__Outputs {
+  _call: DeregisterDelegateBySigCall;
+
+  constructor(call: DeregisterDelegateBySigCall) {
+    this._call = call;
+  }
+}
+
+export class GrantRoleCall extends ethereum.Call {
+  get inputs(): GrantRoleCall__Inputs {
+    return new GrantRoleCall__Inputs(this);
+  }
+
+  get outputs(): GrantRoleCall__Outputs {
+    return new GrantRoleCall__Outputs(this);
+  }
+}
+
+export class GrantRoleCall__Inputs {
+  _call: GrantRoleCall;
+
+  constructor(call: GrantRoleCall) {
+    this._call = call;
+  }
+
+  get role(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+
+  get account(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class GrantRoleCall__Outputs {
+  _call: GrantRoleCall;
+
+  constructor(call: GrantRoleCall) {
     this._call = call;
   }
 }
@@ -285,15 +588,15 @@ export class RegisterDelegateCall__Inputs {
     this._call = call;
   }
 
-  get _tokenAddress(): Address {
+  get tokenAddress(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _tokenChainId(): BigInt {
+  get tokenChainId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
   }
 
-  get _metadata(): string {
+  get metadata(): string {
     return this._call.inputValues[2].value.toString();
   }
 }
@@ -306,40 +609,200 @@ export class RegisterDelegateCall__Outputs {
   }
 }
 
-export class UpdateDelegateMetadataCall extends ethereum.Call {
-  get inputs(): UpdateDelegateMetadataCall__Inputs {
-    return new UpdateDelegateMetadataCall__Inputs(this);
+export class RegisterDelegateBySigCall extends ethereum.Call {
+  get inputs(): RegisterDelegateBySigCall__Inputs {
+    return new RegisterDelegateBySigCall__Inputs(this);
   }
 
-  get outputs(): UpdateDelegateMetadataCall__Outputs {
-    return new UpdateDelegateMetadataCall__Outputs(this);
+  get outputs(): RegisterDelegateBySigCall__Outputs {
+    return new RegisterDelegateBySigCall__Outputs(this);
   }
 }
 
-export class UpdateDelegateMetadataCall__Inputs {
-  _call: UpdateDelegateMetadataCall;
+export class RegisterDelegateBySigCall__Inputs {
+  _call: RegisterDelegateBySigCall;
 
-  constructor(call: UpdateDelegateMetadataCall) {
+  constructor(call: RegisterDelegateBySigCall) {
     this._call = call;
   }
 
-  get _tokenAddress(): Address {
+  get tokenAddress(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _tokenChainId(): BigInt {
+  get tokenChainId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
   }
 
-  get _metadata(): string {
+  get metadata(): string {
     return this._call.inputValues[2].value.toString();
+  }
+
+  get nonce(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get expiry(): BigInt {
+    return this._call.inputValues[4].value.toBigInt();
+  }
+
+  get v(): i32 {
+    return this._call.inputValues[5].value.toI32();
+  }
+
+  get r(): Bytes {
+    return this._call.inputValues[6].value.toBytes();
+  }
+
+  get s(): Bytes {
+    return this._call.inputValues[7].value.toBytes();
   }
 }
 
-export class UpdateDelegateMetadataCall__Outputs {
-  _call: UpdateDelegateMetadataCall;
+export class RegisterDelegateBySigCall__Outputs {
+  _call: RegisterDelegateBySigCall;
 
-  constructor(call: UpdateDelegateMetadataCall) {
+  constructor(call: RegisterDelegateBySigCall) {
+    this._call = call;
+  }
+}
+
+export class RenounceRoleCall extends ethereum.Call {
+  get inputs(): RenounceRoleCall__Inputs {
+    return new RenounceRoleCall__Inputs(this);
+  }
+
+  get outputs(): RenounceRoleCall__Outputs {
+    return new RenounceRoleCall__Outputs(this);
+  }
+}
+
+export class RenounceRoleCall__Inputs {
+  _call: RenounceRoleCall;
+
+  constructor(call: RenounceRoleCall) {
+    this._call = call;
+  }
+
+  get role(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+
+  get account(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class RenounceRoleCall__Outputs {
+  _call: RenounceRoleCall;
+
+  constructor(call: RenounceRoleCall) {
+    this._call = call;
+  }
+}
+
+export class RevokeRoleCall extends ethereum.Call {
+  get inputs(): RevokeRoleCall__Inputs {
+    return new RevokeRoleCall__Inputs(this);
+  }
+
+  get outputs(): RevokeRoleCall__Outputs {
+    return new RevokeRoleCall__Outputs(this);
+  }
+}
+
+export class RevokeRoleCall__Inputs {
+  _call: RevokeRoleCall;
+
+  constructor(call: RevokeRoleCall) {
+    this._call = call;
+  }
+
+  get role(): Bytes {
+    return this._call.inputValues[0].value.toBytes();
+  }
+
+  get account(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class RevokeRoleCall__Outputs {
+  _call: RevokeRoleCall;
+
+  constructor(call: RevokeRoleCall) {
+    this._call = call;
+  }
+}
+
+export class SetExpiryDateForRegistryBackfillCall extends ethereum.Call {
+  get inputs(): SetExpiryDateForRegistryBackfillCall__Inputs {
+    return new SetExpiryDateForRegistryBackfillCall__Inputs(this);
+  }
+
+  get outputs(): SetExpiryDateForRegistryBackfillCall__Outputs {
+    return new SetExpiryDateForRegistryBackfillCall__Outputs(this);
+  }
+}
+
+export class SetExpiryDateForRegistryBackfillCall__Inputs {
+  _call: SetExpiryDateForRegistryBackfillCall;
+
+  constructor(call: SetExpiryDateForRegistryBackfillCall) {
+    this._call = call;
+  }
+
+  get expiry(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetExpiryDateForRegistryBackfillCall__Outputs {
+  _call: SetExpiryDateForRegistryBackfillCall;
+
+  constructor(call: SetExpiryDateForRegistryBackfillCall) {
+    this._call = call;
+  }
+}
+
+export class UploadDelegateCall extends ethereum.Call {
+  get inputs(): UploadDelegateCall__Inputs {
+    return new UploadDelegateCall__Inputs(this);
+  }
+
+  get outputs(): UploadDelegateCall__Outputs {
+    return new UploadDelegateCall__Outputs(this);
+  }
+}
+
+export class UploadDelegateCall__Inputs {
+  _call: UploadDelegateCall;
+
+  constructor(call: UploadDelegateCall) {
+    this._call = call;
+  }
+
+  get delegateAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get tokenAddress(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get tokenChainId(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get metadata(): string {
+    return this._call.inputValues[3].value.toString();
+  }
+}
+
+export class UploadDelegateCall__Outputs {
+  _call: UploadDelegateCall;
+
+  constructor(call: UploadDelegateCall) {
     this._call = call;
   }
 }

@@ -6,9 +6,10 @@ type Delegate @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
-  status: String # string
-  name: String # string
-  profilePictureUrl: String # string
-  statement: String # string
-  ipfsMetadata: String # string
+  status: String
+  name: String
+  profilePictureUrl: String
+  statement: String
+  ipfsMetadata: String
+  acceptedCoC: String
 }

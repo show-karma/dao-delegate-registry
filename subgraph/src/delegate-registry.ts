@@ -1,6 +1,5 @@
 import {
   DelegateAdded as DelegateAddedEvent,
-  DelegateMetadataUpdated as DelegateMetadataUpdatedEvent,
   DelegateRemoved as DelegateRemovedEvent
 } from "../generated/DelegateRegistry/DelegateRegistry"
 import {
@@ -9,10 +8,15 @@ import {
 import { ipfs, store, log, json } from '@graphprotocol/graph-ts'
 import { JSON } from "assemblyscript-json"
 
+export function getDelegateKey(delegateAddress: string, tokenAddress: string, tokenChainId: string): string {
+  return delegateAddress + tokenAddress + tokenChainId;
+}
 export function handleDelegateAdded(event: DelegateAddedEvent): void {
   let entity = new Delegate(
-    event.params.delegateAddress.toHexString() + event.params.tokenAddress.toHexString() + event.params.tokenChainId.toString()
-  )
+    getDelegateKey(event.params.delegateAddress.toHexString(),
+     event.params.tokenAddress.toHexString(),
+     event.params.tokenChainId.toString())
+  );
   entity.delegateAddress = event.params.delegateAddress
   entity.tokenAddress = event.params.tokenAddress
   entity.tokenChainId = event.params.tokenChainId
@@ -42,10 +46,17 @@ export function handleDelegateAdded(event: DelegateAddedEvent): void {
     if (statementOrNull != null) {
       entity.statement = statementOrNull.valueOf();
     }
-    let profilePictureUrlOrNull: JSON.Str | null = jsonObj.getString("profilePictureUrl");"); 
+
+    let profilePictureUrlOrNull: JSON.Str | null = jsonObj.getString("profilePictureUrl");
 
     if (profilePictureUrlOrNull != null) {
-      entity.statement = profilePictureUrlOrNull.valueOf();
+      entity.profilePictureUrl = profilePictureUrlOrNull.valueOf();
+    }
+
+    let acceptedCoCOrNull: JSON.Str | null = jsonObj.getString("acceptedCoC");
+
+    if (acceptedCoCOrNull != null) {
+      entity.acceptedCoC = acceptedCoCOrNull.valueOf();
     }
   }
 
@@ -80,30 +91,20 @@ export function parseIpfsMetadata(entity: Delegate, ipfsMetadataCid: string): vo
 
       let profilePictureUrlOrNull = ipfsMetadata.get("profilePictureUrl")
       if (profilePictureUrlOrNull != null) {
-        entity.statement = profilePictureUrlOrNull.toString();
+        entity.profilePictureUrl = profilePictureUrlOrNull.toString();
+      }
+
+      let acceptedCoC = ipfsMetadata.get("acceptedCoC")
+      if (acceptedCoC != null) {
+        entity.acceptedCoC = acceptedCoC.toString();
       }
     }
   }
 }
 
-export function handleDelegateMetadataUpdated(
-  event: DelegateMetadataUpdatedEvent
-): void {
-  let entity = new Delegate(
-    event.params.delegateAddress.toHexString() + event.params.tokenAddress.toHexString() + event.params.tokenChainId.toString()
-  )
-  entity.delegateAddress = event.params.delegateAddress
-  entity.tokenAddress = event.params.tokenAddress
-  entity.tokenChainId = event.params.tokenChainId
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
 export function handleDelegateRemoved(event: DelegateRemovedEvent): void {
-  //let id = event.params.delegateAddress.toHexString() + event.params.tokenAddress.toHexString() + event.params.tokenChainId
-  //store.remove('Delegate', id)
+  let id = getDelegateKey(event.params.delegateAddress.toHexString(),
+     event.params.tokenAddress.toHexString(),
+     event.params.tokenChainId.toString());
+  store.remove('Delegate', id);
 }

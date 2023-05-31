@@ -23,7 +23,11 @@
     },
     "statement": {
       "type": "string",
-      "description": "The delegate's statement"
+      "description": "The delegate's statement in markdown language"
+    },
+    "acceptedCoC": {
+      "type": "boolean",
+      "description": "Whether the delegate has accepted the Code of Conduct"
     }
-  }    
+  }
 }

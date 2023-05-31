@@ -180,4 +180,21 @@ export class Delegate extends Entity {
       this.set("ipfsMetadata", Value.fromString(<string>value));
     }
   }
+
+  get acceptedCoC(): string | null {
+    let value = this.get("acceptedCoC");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set acceptedCoC(value: string | null) {
+    if (!value) {
+      this.unset("acceptedCoC");
+    } else {
+      this.set("acceptedCoC", Value.fromString(<string>value));
+    }
+  }
 }

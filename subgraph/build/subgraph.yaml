@@ -6,26 +6,23 @@ dataSources:
     name: DelegateRegistry
     network: goerli
     source:
-      address: "0xb797479BF1fa0C982a68a18ad9090286397c3A97"
+      address: "0x281970b26Fa069d947AE81bD4DaA95447F382425"
       abi: DelegateRegistry
-      startBlock: 8978138
+      startBlock: 9099742
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - DelegateAdded
-        - DelegateMetadataUpdated
         - DelegateRemoved
       abis:
         - name: DelegateRegistry
           file: DelegateRegistry/abis/DelegateRegistry.json
       eventHandlers:
-        - event: DelegateAdded(indexed address,address,uint256,string)
+        - event: DelegateAdded(indexed address,indexed address,uint256,string)
           handler: handleDelegateAdded
-        - event: DelegateMetadataUpdated(indexed address,address,uint256,string)
-          handler: handleDelegateMetadataUpdated
-        - event: DelegateRemoved(indexed address,address,uint256)
+        - event: DelegateRemoved(indexed address,indexed address,uint256)
           handler: handleDelegateRemoved
       file: DelegateRegistry/DelegateRegistry.wasm
 features:
