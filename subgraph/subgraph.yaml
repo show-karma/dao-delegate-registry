@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: DelegateRegistry
-    network: goerli 
+    network: optimism
     source:
-      address: "0x281970b26Fa069d947AE81bD4DaA95447F382425"
+      address: "0x6dD79EF7bc4F4310485201E3E900292550b60046"
       abi: DelegateRegistry
-      startBlock:	9099742
+      startBlock:	105330283
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

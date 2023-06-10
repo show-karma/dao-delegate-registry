@@ -1,4 +1,4 @@
-type Delegate @entity(immutable: true) {
+type Delegate @entity {
   id: String!
   delegateAddress: Bytes! # address
   tokenAddress: Bytes! # address
