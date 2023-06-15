@@ -9,7 +9,7 @@
       ],
     "scripts": {
         "prebuild": "eslint -c .eslintrc.js --ext .ts",
-        "build": "rm -rf dist && tsc --build tsconfig.json",
+        "build": "rm -rf dist && tsc --build tsconfig.json"
     },
     "pre-commit": [],
     "author": "Rafael Solari",
