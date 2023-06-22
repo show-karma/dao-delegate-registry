@@ -1,21 +1,19 @@
 import { ethers } from 'ethers';
+import delegateRegistry from '../../smart-contracts/deployments/optimism/DelegateRegistry.json';
 
 import type { DelegateWithProfile, DelegateWithAddress } from './types';
 
 export class DelegateRegistry {
   private contract: ethers.Contract;
-  private provider: ethers.providers.JsonRpcProvider;
+  private provider: ethers.JsonRpcProvider;
+  private signer: ethers.Signer;
 
-  constructor(providerUrl: string, contractAddress: string) {
-    this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
-    const signer = this.provider.getSigner();
+  constructor(signer: ethers.Signer, contractAddress: string, jsonRPCUrl: string) {
+    this.provider = new ethers.JsonRpcProvider(jsonRPCUrl);
+    this.signer = signer;
 
-    const abi = [
-      // insert your contract's ABI here
-      // you can generate it using the solc compiler or Remix IDE
-    ];
-
-    this.contract = new ethers.Contract(contractAddress, abi, this.provider).connect(signer);
+    const readContract = new ethers.Contract(contractAddress, delegateRegistry.abi, this.provider);
+    this.contract = readContract.connect(this.signer) as ethers.Contract;
   }
 
   public async registerDelegate(delegate: DelegateWithProfile): Promise<void> {
