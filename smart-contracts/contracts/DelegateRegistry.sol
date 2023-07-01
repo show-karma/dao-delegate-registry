@@ -42,6 +42,7 @@ contract DelegateRegistry is EIP712, AccessControl {
     }
 
     function registerDelegateBySig(
+        address delegateAddress,
         address tokenAddress,
         uint256 tokenChainId,
         string memory metadata,
@@ -58,13 +59,14 @@ contract DelegateRegistry is EIP712, AccessControl {
                 REGISTER_TYPEHASH,
                 tokenAddress,
                 tokenChainId,
-                metadata,
+                keccak256(bytes(metadata)),
                 nonce,
                 expiry))),
             v,
             r,
             s
         );
+        require(delegateAddress == signer, "Signer and delegate addresses don't match");
         require(nonce == nonces[signer]++, "RegisterDelegate: invalid nonce");
         _registerDelegate(signer, tokenAddress, tokenChainId, metadata);
     }
