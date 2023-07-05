@@ -197,4 +197,30 @@ export class Delegate extends Entity {
       this.set("acceptedCoC", Value.fromString(<string>value));
     }
   }
+
+  get interests(): string | null {
+    let value = this.get("interests");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set interests(value: string | null) {
+    if (!value) {
+      this.unset("interests");
+    } else {
+      this.set("interests", Value.fromString(<string>value));
+    }
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value!.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
 }

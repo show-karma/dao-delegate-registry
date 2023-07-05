@@ -12,4 +12,5 @@ type Delegate @entity {
   statement: String
   ipfsMetadata: String
   acceptedCoC: String
+  interests: String
 }
