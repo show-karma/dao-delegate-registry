@@ -72,10 +72,6 @@ export function handleDelegateAdded(event: DelegateAddedEvent): void {
     }
   }
 
-  if (!entity.createdAt) {
-    entity.createdAt = event.block.timestamp.toString();
-  }
-
   entity.blockNumber = event.block.number;
   entity.blockTimestamp = event.block.timestamp;
   entity.transactionHash = event.transaction.hash;

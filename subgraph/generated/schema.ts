@@ -214,13 +214,4 @@ export class Delegate extends Entity {
       this.set("interests", Value.fromString(<string>value));
     }
   }
-
-  get createdAt(): string {
-    let value = this.get("createdAt");
-    return value!.toString();
-  }
-
-  set createdAt(value: string) {
-    this.set("createdAt", Value.fromString(value));
-  }
 }

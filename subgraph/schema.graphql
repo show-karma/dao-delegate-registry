@@ -13,5 +13,4 @@ type Delegate @entity {
   ipfsMetadata: String
   acceptedCoC: String
   interests: String
-  createdAt: String!
 }
