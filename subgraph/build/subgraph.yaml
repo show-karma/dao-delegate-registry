@@ -6,7 +6,7 @@ dataSources:
     name: DelegateRegistry
     network: optimism
     source:
-      address: "0x6dD79EF7bc4F4310485201E3E900292550b60046"
+      address: "0xd17206EC4D268D0E55bb08A369b6864f1178B81d"
       abi: DelegateRegistry
       startBlock: 105330283
     mapping:

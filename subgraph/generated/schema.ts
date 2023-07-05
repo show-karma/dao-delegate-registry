@@ -197,4 +197,38 @@ export class Delegate extends Entity {
       this.set("acceptedCoC", Value.fromString(<string>value));
     }
   }
+
+  get interests(): string | null {
+    let value = this.get("interests");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set interests(value: string | null) {
+    if (!value) {
+      this.unset("interests");
+    } else {
+      this.set("interests", Value.fromString(<string>value));
+    }
+  }
+
+  get createdAt(): BigInt | null {
+    let value = this.get("createdAt");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set createdAt(value: BigInt | null) {
+    if (!value) {
+      this.unset("createdAt");
+    } else {
+      this.set("createdAt", Value.fromBigInt(<BigInt>value));
+    }
+  }
 }
