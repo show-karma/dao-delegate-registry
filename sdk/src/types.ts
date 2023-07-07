@@ -2,7 +2,7 @@ export type DelegateProfile = {
   name: string; // name of the delegate
   profilePictureUrl: string; // URL of the delegate's profile picture
   status: 'Active' | 'Withdrawn' | 'Pending'; // status of the delegate
-  ipfsMetadata: string; // IPFS hash of delegate's metadata
+  ipfsMetadata?: string; // IPFS hash of delegate's metadata
   statement: string; // Delegate's statement for this DAO
 };
 
