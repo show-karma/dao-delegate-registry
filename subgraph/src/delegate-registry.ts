@@ -31,46 +31,10 @@ export function handleDelegateAdded(event: DelegateAddedEvent): void {
 
   if (ipfsMetadataCid != null && ipfsMetadataCid._str.length != 0) {
     entity.ipfsMetadata = ipfsMetadataCid.valueOf();
-    parseIpfsMetadata(entity, ipfsMetadataCid.valueOf());
-  } else {
-    let statusOrNull: JSON.Str | null = jsonObj.getString("status");
-
-    if (statusOrNull != null) {
-      entity.status = statusOrNull.valueOf();
+    if (!parseIpfsMetadata(entity, ipfsMetadataCid.valueOf())) {
+      assignEntityFields(entity, jsonObj);
     }
-
-    let nameOrNull: JSON.Str | null = jsonObj.getString("name");
-
-    if (nameOrNull != null) {
-      entity.name = nameOrNull.valueOf();
-    }
-
-    let statementOrNull: JSON.Str | null = jsonObj.getString("statement");
-
-    if (statementOrNull != null) {
-      entity.statement = statementOrNull.valueOf();
-    }
-
-    let profilePictureUrlOrNull: JSON.Str | null = jsonObj.getString(
-      "profilePictureUrl"
-    );
-
-    if (profilePictureUrlOrNull != null) {
-      entity.profilePictureUrl = profilePictureUrlOrNull.valueOf();
-    }
-
-    let acceptedCoCOrNull: JSON.Str | null = jsonObj.getString("acceptedCoC");
-
-    if (acceptedCoCOrNull != null) {
-      entity.acceptedCoC = acceptedCoCOrNull.valueOf();
-    }
-
-    let interestsOrNull: JSON.Str | null = jsonObj.getString("interests");
-
-    if (interestsOrNull != null) {
-      entity.interests = interestsOrNull.valueOf();
-    }
-  }
+  } else assignEntityFields(entity, jsonObj);
 
   entity.createdAt = entity.createdAt || event.block.timestamp;
 
@@ -81,41 +45,81 @@ export function handleDelegateAdded(event: DelegateAddedEvent): void {
   entity.save();
 }
 
+export function assignEntityFields(entity: Delegate, jsonObj: JSON.Obj): void {
+  let statusOrNull: JSON.Str | null = jsonObj.getString("status");
+
+  if (statusOrNull != null) {
+    entity.status = statusOrNull.valueOf();
+  }
+
+  let nameOrNull: JSON.Str | null = jsonObj.getString("name");
+
+  if (nameOrNull != null) {
+    entity.name = nameOrNull.valueOf();
+  }
+
+  let statementOrNull: JSON.Str | null = jsonObj.getString("statement");
+
+  if (statementOrNull != null) {
+    entity.statement = statementOrNull.valueOf();
+  }
+
+  let profilePictureUrlOrNull: JSON.Str | null = jsonObj.getString(
+    "profilePictureUrl"
+  );
+
+  if (profilePictureUrlOrNull != null) {
+    entity.profilePictureUrl = profilePictureUrlOrNull.valueOf();
+  }
+
+  let acceptedCoCOrNull: JSON.Str | null = jsonObj.getString("acceptedCoC");
+
+  if (acceptedCoCOrNull != null) {
+    entity.acceptedCoC = acceptedCoCOrNull.valueOf();
+  }
+
+  let interestsOrNull: JSON.Str | null = jsonObj.getString("interests");
+
+  if (interestsOrNull != null) {
+    entity.interests = interestsOrNull.valueOf();
+  }
+}
+
 export function parseIpfsMetadata(
   entity: Delegate,
   ipfsMetadataCid: string
-): void {
+): boolean {
   let data = ipfs.cat(ipfsMetadataCid);
+  if (!data) return false;
 
-  if (data) {
-    const ipfsMetadata = json.fromBytes(data).toObject();
-    if (ipfsMetadata) {
-      let statusOrNull = ipfsMetadata.get("status");
-      if (statusOrNull != null) {
-        entity.status = statusOrNull.toString();
-      }
+  const ipfsMetadata = json.fromBytes(data).toObject();
+  if (ipfsMetadata) {
+    let statusOrNull = ipfsMetadata.get("status");
+    if (statusOrNull != null) {
+      entity.status = statusOrNull.toString();
+    }
 
-      let nameOrNull = ipfsMetadata.get("name");
-      if (nameOrNull != null) {
-        entity.name = nameOrNull.toString();
-      }
+    let nameOrNull = ipfsMetadata.get("name");
+    if (nameOrNull != null) {
+      entity.name = nameOrNull.toString();
+    }
 
-      let statementOrNull = ipfsMetadata.get("statement");
-      if (statementOrNull != null) {
-        entity.statement = statementOrNull.toString();
-      }
+    let statementOrNull = ipfsMetadata.get("statement");
+    if (statementOrNull != null) {
+      entity.statement = statementOrNull.toString();
+    }
 
-      let profilePictureUrlOrNull = ipfsMetadata.get("profilePictureUrl");
-      if (profilePictureUrlOrNull != null) {
-        entity.profilePictureUrl = profilePictureUrlOrNull.toString();
-      }
+    let profilePictureUrlOrNull = ipfsMetadata.get("profilePictureUrl");
+    if (profilePictureUrlOrNull != null) {
+      entity.profilePictureUrl = profilePictureUrlOrNull.toString();
+    }
 
-      let acceptedCoC = ipfsMetadata.get("acceptedCoC");
-      if (acceptedCoC != null) {
-        entity.acceptedCoC = acceptedCoC.toString();
-      }
+    let acceptedCoC = ipfsMetadata.get("acceptedCoC");
+    if (acceptedCoC != null) {
+      entity.acceptedCoC = acceptedCoC.toString();
     }
   }
+  return true;
 }
 
 export function handleDelegateRemoved(event: DelegateRemovedEvent): void {
