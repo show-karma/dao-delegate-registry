@@ -29,7 +29,7 @@ export function handleDelegateAdded(event: DelegateAddedEvent): void {
 
   let ipfsMetadataCid: JSON.Str | null = jsonObj.getString("ipfsMetadata");
 
-  if (ipfsMetadataCid != null) {
+  if (ipfsMetadataCid != null && ipfsMetadataCid._str.length != 0) {
     entity.ipfsMetadata = ipfsMetadataCid.valueOf();
     parseIpfsMetadata(entity, ipfsMetadataCid.valueOf());
   } else {
