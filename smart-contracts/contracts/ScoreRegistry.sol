@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract ReferrerResolver is
+contract ScoreRegistry is
     Initializable,
     OwnableUpgradeable,
     EIP712Upgradeable
