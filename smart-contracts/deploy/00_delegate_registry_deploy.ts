@@ -11,7 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         from: deployer,
         log: true,
         autoMine: true,
-        args: [<Admin Adddress>]
+        args: ["<Admin Address>"]
     });
 };
 export default func;
