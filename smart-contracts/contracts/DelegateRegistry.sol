@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
+
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract DelegateRegistry is EIP712, AccessControl {
-    bytes32 public constant PROVIDER_ROLE = keccak256("PROVIDER_ROLE");
+contract DelegateRegistry is EIP712, AccessControl  {
+   bytes32 public constant PROVIDER_ROLE = keccak256("PROVIDER_ROLE");
 
     mapping(address => mapping(address => mapping(uint256 => uint8))) public delegates;
     mapping (address => uint) public nonces;
 
     uint public expiryDateForRegistryBackfill;
+    uint256 public registrationFeeAmount;
 
     constructor(address admin) EIP712("delegate-registry", "1.0") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -27,7 +29,12 @@ contract DelegateRegistry is EIP712, AccessControl {
         expiryDateForRegistryBackfill = expiry;
     }
 
-    function registerDelegate(address tokenAddress, uint256 tokenChainId, string memory metadata) public {
+    function setRegistrationFee(uint256 _registrationFeeAmount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        registrationFeeAmount = _registrationFeeAmount;
+    }
+
+    function registerDelegate(address tokenAddress, uint256 tokenChainId, string memory metadata) public payable {
+        _payRegistrationFee();
         _registerDelegate(msg.sender, tokenAddress, tokenChainId, metadata);
     }
 
@@ -38,10 +45,11 @@ contract DelegateRegistry is EIP712, AccessControl {
         string memory metadata
     ) public onlyRole(PROVIDER_ROLE) {
         require(block.timestamp <= expiryDateForRegistryBackfill, "RegisterDelegate: registry backfill period has expired");
+        _payRegistrationFee();
         _registerDelegate(delegateAddress, tokenAddress, tokenChainId, metadata);
     }
 
-    function registerDelegateBySig(
+   function registerDelegateBySig(
         address delegateAddress,
         address tokenAddress,
         uint256 tokenChainId,
@@ -51,8 +59,9 @@ contract DelegateRegistry is EIP712, AccessControl {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public virtual {
+    ) public payable virtual {
         require(block.timestamp <= expiry, "RegisterDelegate: signature expired");
+        _payRegistrationFee();
 
         address signer = ECDSA.recover(
             _hashTypedDataV4(keccak256(abi.encode(
@@ -73,9 +82,10 @@ contract DelegateRegistry is EIP712, AccessControl {
 
     function deregisterDelegate(address tokenAddress, uint256 tokenChainId) public {
         _deregisterDelegate(msg.sender, tokenAddress, tokenChainId);
+        _refundRegistrationFee();
     }
 
-    function deregisterDelegateBySig(
+ function deregisterDelegateBySig(
         address tokenAddress,
         uint256 tokenChainId,
         uint256 nonce,
@@ -99,6 +109,7 @@ contract DelegateRegistry is EIP712, AccessControl {
         );
         require(nonce == nonces[signer]++, "DeregisterDelegate: invalid nonce");
         _deregisterDelegate(signer, tokenAddress, tokenChainId);
+           _refundRegistrationFee();
     }
 
     function isDelegateRegistered(address delegateAddress, address tokenAddress, uint256 tokenChainId)
@@ -115,7 +126,7 @@ contract DelegateRegistry is EIP712, AccessControl {
         uint256 tokenChainId,
         string memory metadata
     )
-         private
+        private
     {
         delegates[delegateAddress][tokenAddress][tokenChainId] = 1;
 
@@ -125,5 +136,15 @@ contract DelegateRegistry is EIP712, AccessControl {
     function _deregisterDelegate(address delegateAddress, address tokenAddress, uint256 tokenChainId) private {
         delegates[delegateAddress][tokenAddress][tokenChainId] = 0;
         emit DelegateRemoved(delegateAddress, tokenAddress, tokenChainId);
+    }
+
+    function _payRegistrationFee() internal view {
+        require(msg.value >= registrationFeeAmount, "RegisterDelegate: insufficient fee");
+    }
+
+    function _refundRegistrationFee() private {
+        if (address(this).balance > registrationFeeAmount) {
+            payable(msg.sender).transfer(registrationFeeAmount);
+        }
     }
 }
