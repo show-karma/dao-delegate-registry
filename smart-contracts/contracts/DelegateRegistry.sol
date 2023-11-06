@@ -143,7 +143,7 @@ contract DelegateRegistry is EIP712, AccessControl  {
     }
 
     function _refundRegistrationFee() private {
-        if (address(this).balance > registrationFeeAmount) {
+        if (address(this).balance >= registrationFeeAmount) {
             payable(msg.sender).transfer(registrationFeeAmount);
         }
     }
