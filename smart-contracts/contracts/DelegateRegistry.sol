@@ -81,6 +81,7 @@ contract DelegateRegistry is EIP712, AccessControl  {
     }
 
     function deregisterDelegate(address tokenAddress, uint256 tokenChainId) public {
+        require(isDelegateRegistered(msg.sender, tokenAddress, tokenChainId) == 1, "Not a registered delegate");
         _deregisterDelegate(msg.sender, tokenAddress, tokenChainId);
         _refundRegistrationFee();
     }
@@ -108,6 +109,8 @@ contract DelegateRegistry is EIP712, AccessControl  {
             s
         );
         require(nonce == nonces[signer]++, "DeregisterDelegate: invalid nonce");
+        require(isDelegateRegistered(signer, tokenAddress, tokenChainId) == 1, "Not a registered delegate");
+
         _deregisterDelegate(signer, tokenAddress, tokenChainId);
            _refundRegistrationFee();
     }
@@ -138,13 +141,17 @@ contract DelegateRegistry is EIP712, AccessControl  {
         emit DelegateRemoved(delegateAddress, tokenAddress, tokenChainId);
     }
 
-    function _payRegistrationFee() internal view {
+    function _payRegistrationFee() internal {
         require(msg.value >= registrationFeeAmount, "RegisterDelegate: insufficient fee");
+        if (msg.value > registrationFeeAmount) {
+            (bool success, ) = payable(msg.sender).call{value: msg.value - registrationFeeAmount}("");
+            require(success, "Refund of excess fee failed");
+        }
     }
 
     function _refundRegistrationFee() private {
-        if (address(this).balance >= registrationFeeAmount) {
-            payable(msg.sender).transfer(registrationFeeAmount);
-        }
+        require(address(this).balance >= registrationFeeAmount, "Insufficient balance for refund");
+        (bool success, ) = payable(msg.sender).call{value: registrationFeeAmount}("");
+        require(success, "Refund failed");
     }
 }
