@@ -7,6 +7,7 @@ export type DelegateProfile = {
 };
 
 export type Delegate = {
+  address: string; // address of the delegate
   tokenAddress: string; // address of the DAO's token
   tokenChainId: number; // chain ID of this DAO's network
 };
