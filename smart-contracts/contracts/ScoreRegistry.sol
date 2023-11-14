@@ -10,49 +10,54 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract ScoreRegistry is
-    Initializable,
-    OwnableUpgradeable,
-    EIP712Upgradeable
-{
-    mapping(address => uint) private whitelist;
+contract ScoreRegistry is Initializable, OwnableUpgradeable, EIP712Upgradeable {
+    mapping(address => uint256) private whitelist;
     mapping(address => mapping(address => mapping(uint256 => Stats)))
         private stats;
 
-    IDelegateRegistry public delegateRegistry;
+    IDelegateRegistry private delegateRegistry;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    function initialize(IDelegateRegistry delegateRegistry) public initializer {
-        _owner = msg.sender;
+    function initialize(IDelegateRegistry _delegateRegistry)
+        public
+        initializer
+    {
+        delegateRegistry = _delegateRegistry;
         __Ownable_init();
     }
 
-    function setStats(Stats memory payload) public {
+    function setStats(
+        Stats calldata payload,
+        address user,
+        address token,
+        uint32 chainId
+    ) public {
         require(
             whitelist[msg.sender] == 1,
             "ReferrerResolver: sender is not whitelisted"
         );
         require(
-            delegateRegistry.isDelegateRegistered(msg.sender) != address(0),
+            delegateRegistry.isDelegateRegistered(user, token, chainId) != 1,
             "ReferrerResolver: delegate is not registered"
         );
 
         stats[user][token][chainId] = payload;
     }
 
-    function isDelegateRegistered(address user) public view returns (address) {
-        return delegateRegistry.isDelegateRegistered(user);
-    }
-
-    function setWhitelist(address user, uint status) public onlyOwner {
+    function setWhitelist(address user, uint256 status) public onlyOwner {
         whitelist[user] = status;
     }
 
-    function getWhitelist(address user) public view onlyOwner returns (uint) {
+    function getWhitelist(address user)
+        public
+        view
+        onlyOwner
+        returns (uint256)
+    {
         return whitelist[user];
     }
 
