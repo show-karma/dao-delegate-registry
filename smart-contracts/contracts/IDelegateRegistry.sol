@@ -9,5 +9,5 @@ abstract contract IDelegateRegistry is EIP712, AccessControl {
         address delegateAddress,
         address tokenAddress,
         uint256 tokenChainId
-    ) external view returns (uint8 isRegistered);
+    ) virtual external view returns (uint8 isRegistered);
 }
