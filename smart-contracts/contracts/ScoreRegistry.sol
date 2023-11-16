@@ -30,34 +30,47 @@ contract ScoreRegistry is Initializable, OwnableUpgradeable, EIP712Upgradeable {
         __Ownable_init();
     }
 
+    function setDelegateRegistry(IDelegateRegistry _delegateRegistry)
+        public
+        onlyOwner
+    {
+        delegateRegistry = _delegateRegistry;
+    }
+
     function setStats(
         Stats calldata payload,
         address user,
         address token,
         uint32 chainId
     ) public {
+        
+        require(whitelist[msg.sender] == 1, "sender is not whitelisted");
         require(
-            whitelist[msg.sender] == 1,
-            "ReferrerResolver: sender is not whitelisted"
-        );
-        require(
-            delegateRegistry.isDelegateRegistered(user, token, chainId) != 1,
-            "ReferrerResolver: delegate is not registered"
+            isDelegateRegistered(user, token, chainId) == 1,
+            "delegate is not registered"
         );
 
         stats[user][token][chainId] = payload;
+    }
+
+    function isDelegateRegistered(
+        address user,
+        address token,
+        uint32 chainId
+    ) public view returns (uint8 isRegistered) {
+        isRegistered = delegateRegistry.isDelegateRegistered(
+            user,
+            token,
+            chainId
+        );
+        return isRegistered;
     }
 
     function setWhitelist(address user, uint256 status) public onlyOwner {
         whitelist[user] = status;
     }
 
-    function getWhitelist(address user)
-        public
-        view
-        onlyOwner
-        returns (uint256)
-    {
+    function getWhitelist(address user) public view returns (uint256) {
         return whitelist[user];
     }
 
