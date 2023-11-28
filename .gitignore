@@ -11,3 +11,6 @@ artifacts
 
 secrets.json
 hardhat.config.ts
+
+*.swp
+*.swo
